@@ -19,7 +19,6 @@ namespace MintTest.Employees
         public const int Count = 5;
 
         const string FolderName = "employee-avatars";
-        const string PlaceholderPath = "Res/resources/progile-avatar-bg";
         const string PrimaryUrl = "https://picsum.photos/200";
 
         readonly Sprite[] sprites = new Sprite[Count];
@@ -30,14 +29,11 @@ namespace MintTest.Employees
 
         public event Action Changed;
 
-        public static Sprite Placeholder
+        public static Sprite Placeholder => placeholder;
+
+        public static void SetPlaceholder(Sprite sprite)
         {
-            get
-            {
-                if (placeholder == null)
-                    placeholder = Resources.Load<Sprite>(PlaceholderPath);
-                return placeholder;
-            }
+            placeholder = sprite;
         }
 
         public Sprite SpriteFor(int employeeId)

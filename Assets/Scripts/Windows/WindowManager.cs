@@ -11,6 +11,7 @@ namespace MintTest.Windows
         [SerializeField] List<WindowSlot> windows;
         [SerializeField] EmployeeListView employeeList;
         [SerializeField] EmployeeListView favoritesList;
+        [SerializeField] Sprite avatarPlaceholder;
 
         readonly List<IWindow> windowsList = new List<IWindow>();
         readonly EmployeeDataStore employees = new EmployeeDataStore();
@@ -53,7 +54,10 @@ namespace MintTest.Windows
                 IWindow window = slot == null ? null : slot.ToWindow();
                 if (window == null)
                 {
-                    Debug.LogError("WindowManager: элемент списка не реализует IWindow.", this);
+                    Debug.LogError(
+                        "WindowManager: слот " + i + " пустой или без IWindow. " +
+                        "Перетащи TabWindow/ProfileWindow с префаба окна.",
+                        this);
                     windowsList.Clear();
                     return false;
                 }
@@ -83,6 +87,11 @@ namespace MintTest.Windows
         {
             if (repository == null)
                 repository = JsonEmployeeRepository.Empty;
+
+            if (avatarPlaceholder == null)
+                Debug.LogError("WindowManager: назначь Avatar Placeholder в инспекторе.", this);
+            else
+                EmployeeAvatars.SetPlaceholder(avatarPlaceholder);
 
             avatars.LoadSaved();
             popup.SetLookup(repository);
