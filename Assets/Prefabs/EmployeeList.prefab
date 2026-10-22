@@ -190,6 +190,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6431273345291456340}
+  - component: {fileID: 5918273645501928374}
   m_Layer: 5
   m_Name: EmployeeList
   m_TagString: Untagged
@@ -217,6 +218,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: -400}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &5918273645501928374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4989042096007789867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4e8c1a07d5f4a2e9c6b3d1f8a0e5c72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardPrefab: {fileID: 880000000000000001, guid: 99ecb9ae00c1d3f429d4d960c431a73f, type: 3}
+  scrollRect: {fileID: 4492847732322833481}
 --- !u!1 &6885816415796220339
 GameObject:
   m_ObjectHideFlags: 0

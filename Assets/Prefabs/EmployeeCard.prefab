@@ -328,6 +328,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   openProfileButton: {fileID: 2964163096043747599}
+  nameText: {fileID: 9143553443408811392}
+  descriptionText: {fileID: 5321839379020378524}
 --- !u!222 &2522272475682038465
 CanvasRenderer:
   m_ObjectHideFlags: 0
