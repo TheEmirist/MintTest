@@ -48,7 +48,25 @@ namespace MintTest.Employees
             if (asset == null)
                 return false;
 
-            EmployeeFile file = JsonUtility.FromJson<EmployeeFile>(asset.text);
+            return TryParse(asset.text, out repository);
+        }
+
+        public static bool TryParse(string json, out JsonEmployeeRepository repository)
+        {
+            repository = Empty;
+            if (string.IsNullOrEmpty(json))
+                return false;
+
+            EmployeeFile file;
+            try
+            {
+                file = JsonUtility.FromJson<EmployeeFile>(json);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
             if (file == null || file.data == null)
                 return false;
 

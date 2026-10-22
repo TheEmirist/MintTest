@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using MintTest.Employees;
 using UnityEngine;
@@ -7,13 +8,12 @@ namespace MintTest.Windows
 {
     public class WindowManager : MonoBehaviour
     {
-        const string EmployeeResource = "test_task_mock_data";
-
         [SerializeField] List<WindowSlot> windows;
         [SerializeField] EmployeeListView employeeList;
         [SerializeField] EmployeeListView favoritesList;
 
         readonly List<IWindow> windowsList = new List<IWindow>();
+        readonly EmployeeDataStore employees = new EmployeeDataStore();
         readonly EmployeeAvatars avatars = new EmployeeAvatars();
         IWindow current;
         IWindow overlay;
@@ -24,11 +24,17 @@ namespace MintTest.Windows
             if (!Collect())
                 return;
 
-            BindEmployees();
             for (int i = 0; i < windowsList.Count; i++)
                 windowsList[i].Close();
 
             Show(windowsList[0]);
+            StartCoroutine(Boot());
+        }
+
+        IEnumerator Boot()
+        {
+            yield return employees.Ensure();
+            BindEmployees(employees.Repository);
         }
 
         bool Collect()
@@ -73,13 +79,10 @@ namespace MintTest.Windows
             return true;
         }
 
-        void BindEmployees()
+        void BindEmployees(JsonEmployeeRepository repository)
         {
-            if (!JsonEmployeeRepository.TryLoad(EmployeeResource, out JsonEmployeeRepository repository))
-            {
-                Debug.LogError("WindowManager: не прочитал test_task_mock_data.", this);
+            if (repository == null)
                 repository = JsonEmployeeRepository.Empty;
-            }
 
             avatars.LoadSaved();
             popup.SetLookup(repository);
