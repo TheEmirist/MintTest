@@ -285,6 +285,7 @@ GameObject:
   - component: {fileID: 1086357482328921250}
   - component: {fileID: 2522272475682038465}
   - component: {fileID: 7523175881728774576}
+  - component: {fileID: 880000000000000001}
   m_Layer: 5
   m_Name: EmployeeCard
   m_TagString: Untagged
@@ -314,6 +315,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 140}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &880000000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3096815907957047888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8b1c4d72a6f4c0e9d3a5b7c1e2f4a60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  openProfileButton: {fileID: 2964163096043747599}
 --- !u!222 &2522272475682038465
 CanvasRenderer:
   m_ObjectHideFlags: 0
