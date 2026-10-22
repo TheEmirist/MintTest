@@ -1383,6 +1383,7 @@ MonoBehaviour:
   genderText: {fileID: 730000000000010066}
   emailText: {fileID: 730000000000010081}
   ipText: {fileID: 730000000000010091}
+  avatarImage: {fileID: 730000000000010053}
 --- !u!1001 &730000000000010036
 PrefabInstance:
   m_ObjectHideFlags: 0

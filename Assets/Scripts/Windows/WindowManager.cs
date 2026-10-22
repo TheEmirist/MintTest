@@ -14,6 +14,7 @@ namespace MintTest.Windows
         [SerializeField] EmployeeListView favoritesList;
 
         readonly List<IWindow> windowsList = new List<IWindow>();
+        readonly EmployeeAvatars avatars = new EmployeeAvatars();
         IWindow current;
         IWindow overlay;
         IPopupWindow popup;
@@ -80,10 +81,13 @@ namespace MintTest.Windows
                 repository = JsonEmployeeRepository.Empty;
             }
 
+            avatars.LoadSaved();
             popup.SetLookup(repository);
+            popup.SetAvatars(avatars);
             FavoriteStore favorites = FavoriteStore.Load();
-            employeeList.Bind(repository, favorites, false);
-            favoritesList.Bind(repository, favorites, true);
+            employeeList.Bind(repository, favorites, avatars, false);
+            favoritesList.Bind(repository, favorites, avatars, true);
+            StartCoroutine(avatars.Ensure(repository.All));
         }
 
         void OnEnable()

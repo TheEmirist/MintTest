@@ -13,8 +13,11 @@ namespace MintTest.Windows
         [SerializeField] TMP_Text genderText;
         [SerializeField] TMP_Text emailText;
         [SerializeField] TMP_Text ipText;
+        [SerializeField] Image avatarImage;
 
         IEmployeeLookup lookup;
+        IEmployeeAvatars avatars;
+        int shownId = -1;
 
         public event Action BackRequested;
 
@@ -23,10 +26,19 @@ namespace MintTest.Windows
             lookup = source;
         }
 
+        public void SetAvatars(IEmployeeAvatars source)
+        {
+            if (avatars != null)
+                avatars.Changed -= OnAvatarsChanged;
+
+            avatars = source;
+
+            if (avatars != null)
+                avatars.Changed += OnAvatarsChanged;
+        }
+
         public bool Show(int id)
         {
-            ResolveTexts();
-
             if (lookup == null)
             {
                 Debug.LogError("ProfileWindow: не задан справочник сотрудников.", this);
@@ -49,6 +61,8 @@ namespace MintTest.Windows
             genderText.text = "Gender: <color=#1A1F32><b>" + record.gender + "</b></color>";
             emailText.text = record.email;
             ipText.text = record.ip_address;
+            shownId = id;
+            ApplyPicture(id);
             return true;
         }
 
@@ -67,6 +81,30 @@ namespace MintTest.Windows
         {
             if (backButton != null)
                 backButton.onClick.RemoveListener(RequestBack);
+            if (avatars != null)
+                avatars.Changed -= OnAvatarsChanged;
+        }
+
+        void OnAvatarsChanged()
+        {
+            if (!isActiveAndEnabled || shownId < 0)
+                return;
+
+            ApplyPicture(shownId);
+        }
+
+        void ApplyPicture(int id)
+        {
+            if (avatarImage == null)
+            {
+                Debug.LogError("ProfileWindow: не задан Avatar.", this);
+                return;
+            }
+
+            Sprite sprite = avatars == null ? null : avatars.SpriteFor(id);
+            Sprite next = sprite != null ? sprite : EmployeeAvatars.Placeholder;
+            if (next != null)
+                avatarImage.sprite = next;
         }
 
         void RequestBack()
@@ -82,36 +120,6 @@ namespace MintTest.Windows
         public void Close()
         {
             gameObject.SetActive(false);
-        }
-
-        void ResolveTexts()
-        {
-            if (nameText != null && genderText != null && emailText != null && ipText != null)
-                return;
-
-            TMP_Text[] texts = GetComponentsInChildren<TMP_Text>(true);
-            for (int i = 0; i < texts.Length; i++)
-            {
-                switch (texts[i].name)
-                {
-                    case "NameText":
-                        if (nameText == null)
-                            nameText = texts[i];
-                        break;
-                    case "GenderText":
-                        if (genderText == null)
-                            genderText = texts[i];
-                        break;
-                    case "EmailValue":
-                        if (emailText == null)
-                            emailText = texts[i];
-                        break;
-                    case "PhoneValue":
-                        if (ipText == null)
-                            ipText = texts[i];
-                        break;
-                }
-            }
         }
     }
 }

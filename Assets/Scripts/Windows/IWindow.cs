@@ -21,6 +21,8 @@ namespace MintTest.Windows
 
         void SetLookup(IEmployeeLookup source);
 
+        void SetAvatars(IEmployeeAvatars source);
+
         bool Show(int id);
     }
 }

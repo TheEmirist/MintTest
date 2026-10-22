@@ -20,6 +20,7 @@ namespace MintTest.Employees
 
         IEmployeeCatalog catalog = EmptyCatalog.Instance;
         FavoriteStore favorites;
+        IEmployeeAvatars avatars;
         EmployeeRecord[] records = Array.Empty<EmployeeRecord>();
         bool onlyFavorites;
         RectTransform content;
@@ -36,17 +37,22 @@ namespace MintTest.Employees
         bool hasCatalog;
         bool built;
 
-        public void Bind(IEmployeeCatalog source, FavoriteStore store, bool favoritesOnly)
+        public void Bind(IEmployeeCatalog source, FavoriteStore store, IEmployeeAvatars pictures, bool favoritesOnly)
         {
             if (favorites != null)
                 favorites.Changed -= OnFavoritesChanged;
+            if (avatars != null)
+                avatars.Changed -= OnAvatarsChanged;
 
             catalog = source ?? EmptyCatalog.Instance;
             favorites = store;
+            avatars = pictures;
             onlyFavorites = favoritesOnly;
 
             if (favorites != null)
                 favorites.Changed += OnFavoritesChanged;
+            if (avatars != null)
+                avatars.Changed += OnAvatarsChanged;
 
             ApplyRecords(CurrentRecords());
         }
@@ -55,6 +61,8 @@ namespace MintTest.Employees
         {
             if (favorites != null)
                 favorites.Changed -= OnFavoritesChanged;
+            if (avatars != null)
+                avatars.Changed -= OnAvatarsChanged;
 
             for (int i = 0; i < hooked.Count; i++)
             {
@@ -74,6 +82,11 @@ namespace MintTest.Employees
                 return;
             }
 
+            RebindVisible();
+        }
+
+        void OnAvatarsChanged()
+        {
             RebindVisible();
         }
 
@@ -143,13 +156,21 @@ namespace MintTest.Employees
                 if (index < 0 || index >= records.Length)
                     continue;
 
-                active[i].Card.Bind(records[index], IsFavorite(records[index]));
+                active[i].Card.Bind(records[index], IsFavorite(records[index]), AvatarFor(records[index]));
             }
         }
 
         bool IsFavorite(EmployeeRecord record)
         {
             return record != null && favorites != null && favorites.Contains(record.id);
+        }
+
+        Sprite AvatarFor(EmployeeRecord record)
+        {
+            if (record == null || avatars == null)
+                return null;
+
+            return avatars.SpriteFor(record.id);
         }
 
         void Awake()
@@ -361,7 +382,7 @@ namespace MintTest.Employees
                     break;
                 }
 
-                card.Bind(records[index], IsFavorite(records[index]));
+                card.Bind(records[index], IsFavorite(records[index]), AvatarFor(records[index]));
                 Place(card, index);
                 active.Add(new ActiveCard(card, index));
             }

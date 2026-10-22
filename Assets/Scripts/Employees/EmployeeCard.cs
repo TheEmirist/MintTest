@@ -14,6 +14,7 @@ namespace MintTest.Employees
         [SerializeField] Sprite favoriteOn;
         [SerializeField] TMP_Text nameText;
         [SerializeField] TMP_Text descriptionText;
+        [SerializeField] Image picture;
 
         int employeeId = -1;
 
@@ -35,7 +36,7 @@ namespace MintTest.Employees
                 favoriteButton.onClick.AddListener(RequestToggleFavorite);
         }
 
-        public void Bind(EmployeeRecord record, bool favorite)
+        public void Bind(EmployeeRecord record, bool favorite, Sprite avatar)
         {
             if (record == null)
                 return;
@@ -51,6 +52,7 @@ namespace MintTest.Employees
 
             nameText.text = record.first_name + " " + record.last_name;
             descriptionText.text = record.email + " | " + record.ip_address;
+            ApplyPicture(avatar);
             SetFavorite(favorite);
         }
 
@@ -92,6 +94,32 @@ namespace MintTest.Employees
                 if (icon != null)
                     favoriteIcon = icon.GetComponent<Image>();
             }
+
+            if (picture == null)
+            {
+                Image[] images = GetComponentsInChildren<Image>(true);
+                for (int i = 0; i < images.Length; i++)
+                {
+                    if (images[i].name == "ProfilePicture")
+                    {
+                        picture = images[i];
+                        break;
+                    }
+                }
+            }
+        }
+
+        void ApplyPicture(Sprite avatar)
+        {
+            if (picture == null)
+            {
+                Debug.LogError("EmployeeCard: нет ProfilePicture.", this);
+                return;
+            }
+
+            Sprite next = avatar != null ? avatar : EmployeeAvatars.Placeholder;
+            if (next != null)
+                picture.sprite = next;
         }
 
         void OnDestroy()
