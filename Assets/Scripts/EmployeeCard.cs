@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,6 +8,10 @@ public class EmployeeCard : MonoBehaviour
     [SerializeField] Button openProfileButton;
     [SerializeField] TMP_Text nameText;
     [SerializeField] TMP_Text descriptionText;
+
+    int employeeId = -1;
+
+    public event Action<int> ProfileRequested;
 
     void Awake()
     {
@@ -26,6 +31,7 @@ public class EmployeeCard : MonoBehaviour
         if (record == null)
             return;
 
+        employeeId = record.id;
         ResolveTexts();
 
         if (nameText == null || descriptionText == null)
@@ -61,6 +67,9 @@ public class EmployeeCard : MonoBehaviour
 
     void RequestOpenProfile()
     {
-        OpenProfile.Raise();
+        if (employeeId < 0)
+            return;
+
+        ProfileRequested?.Invoke(employeeId);
     }
 }

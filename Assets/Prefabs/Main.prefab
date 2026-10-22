@@ -50,7 +50,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c33f2e506d9f61cab804b6da312f5c93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 0}
   tabButton: {fileID: 0}
   otherTabButton: {fileID: 0}
 --- !u!1001 &4899670603227375580

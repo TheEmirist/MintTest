@@ -6,13 +6,15 @@ using UnityEngine.UI;
 public class EmployeeListView : MonoBehaviour
 {
     const int PoolSize = 14;
-    const string ResourceName = "test_task_mock_data";
 
     [SerializeField] EmployeeCard cardPrefab;
     [SerializeField] ScrollRect scrollRect;
 
     readonly EmployeeCardPool pool = new EmployeeCardPool();
     readonly List<ActiveCard> active = new List<ActiveCard>();
+    readonly List<EmployeeCard> hooked = new List<EmployeeCard>();
+
+    public event Action<int> PopupRequested;
 
     EmployeeRecord[] records = Array.Empty<EmployeeRecord>();
     RectTransform content;
@@ -25,6 +27,18 @@ public class EmployeeListView : MonoBehaviour
     float stride = 156f;
     int shownFirst = int.MinValue;
     int shownLast = int.MinValue;
+    bool viewReady;
+    bool hasCatalog;
+    bool built;
+
+    public void SetCatalog(IEmployeeCatalog catalog)
+    {
+        records = catalog == null || catalog.All == null
+            ? Array.Empty<EmployeeRecord>()
+            : catalog.All;
+        hasCatalog = true;
+        TryBuild();
+    }
 
     void Awake()
     {
@@ -39,7 +53,16 @@ public class EmployeeListView : MonoBehaviour
 
         content = scrollRect.content;
         ReadLayout();
-        records = LoadRecords();
+        viewReady = true;
+        TryBuild();
+    }
+
+    void TryBuild()
+    {
+        if (!viewReady || !hasCatalog || built)
+            return;
+
+        built = true;
         BuildPool();
         ResizeContent();
         Refresh();
@@ -80,25 +103,6 @@ public class EmployeeListView : MonoBehaviour
             fitter.enabled = false;
     }
 
-    EmployeeRecord[] LoadRecords()
-    {
-        TextAsset asset = Resources.Load<TextAsset>(ResourceName);
-        if (asset == null)
-        {
-            Debug.LogError("EmployeeListView: нет Resources/test_task_mock_data.", this);
-            return Array.Empty<EmployeeRecord>();
-        }
-
-        EmployeeCatalog catalog = JsonUtility.FromJson<EmployeeCatalog>(asset.text);
-        if (catalog == null || catalog.data == null)
-        {
-            Debug.LogError("EmployeeListView: не разобрал test_task_mock_data.", this);
-            return Array.Empty<EmployeeRecord>();
-        }
-
-        return catalog.data;
-    }
-
     void BuildPool()
     {
         List<EmployeeCard> cards = CollectExisting();
@@ -127,7 +131,25 @@ public class EmployeeListView : MonoBehaviour
             stride = 1f;
 
         for (int i = 0; i < cards.Count; i++)
+        {
+            cards[i].ProfileRequested += OnProfileRequested;
+            hooked.Add(cards[i]);
             pool.Add(cards[i]);
+        }
+    }
+
+    void OnDestroy()
+    {
+        for (int i = 0; i < hooked.Count; i++)
+        {
+            if (hooked[i] != null)
+                hooked[i].ProfileRequested -= OnProfileRequested;
+        }
+    }
+
+    void OnProfileRequested(int id)
+    {
+        PopupRequested?.Invoke(id);
     }
 
     List<EmployeeCard> CollectExisting()
@@ -274,21 +296,4 @@ public class EmployeeCardPool
         card.gameObject.SetActive(false);
         free.Push(card);
     }
-}
-
-[Serializable]
-public class EmployeeCatalog
-{
-    public EmployeeRecord[] data;
-}
-
-[Serializable]
-public class EmployeeRecord
-{
-    public int id;
-    public string first_name;
-    public string last_name;
-    public string email;
-    public string gender;
-    public string ip_address;
 }

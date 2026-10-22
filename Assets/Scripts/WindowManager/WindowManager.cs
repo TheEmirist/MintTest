@@ -1,38 +1,118 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WindowManager : MonoBehaviour
 {
-    [SerializeField] MainWindow mainWindow;
-    [SerializeField] FavoritesWindow favoritesWindow;
-    [SerializeField] ProfileWindow profileWindow;
+    const string EmployeeResource = "test_task_mock_data";
+
+    [SerializeField] List<Window> windows;
+    [SerializeField] EmployeeListView employeeList;
 
     IWindow current;
     IWindow overlay;
+    IPopupWindow popup;
 
     void Awake()
     {
-        if (mainWindow == null || favoritesWindow == null || profileWindow == null)
-        {
-            Debug.LogError("WindowManager: заполни окна в инспекторе.", this);
+        if (!Collect())
             return;
+
+        BindEmployees();
+        for (int i = 0; i < windows.Count; i++)
+            windows[i].Close();
+
+        Show(windows[0]);
+    }
+
+    bool Collect()
+    {
+        if (windows == null || windows.Count == 0 || employeeList == null)
+        {
+            Debug.LogError("WindowManager: заполни поля в инспекторе.", this);
+            return false;
         }
 
-        mainWindow.Init();
-        favoritesWindow.Init();
-        profileWindow.Init();
-        favoritesWindow.Close();
-        profileWindow.Close();
-        Show(mainWindow);
+        for (int i = 0; i < windows.Count; i++)
+        {
+            if (windows[i] == null)
+            {
+                Debug.LogError("WindowManager: пустой элемент списка окон.", this);
+                return false;
+            }
+        }
+
+        for (int i = 0; i < windows.Count; i++)
+        {
+            Window window = windows[i];
+            window.Init();
+
+            if (window is IPopupWindow found)
+                popup = found;
+        }
+
+        if (popup == null)
+        {
+            Debug.LogError("WindowManager: в списке нет окна профиля.", this);
+            return false;
+        }
+
+        return true;
+    }
+
+    void BindEmployees()
+    {
+        if (!JsonEmployeeRepository.TryLoad(EmployeeResource, out JsonEmployeeRepository repository))
+        {
+            Debug.LogError("WindowManager: не прочитал test_task_mock_data.", this);
+            repository = JsonEmployeeRepository.Empty;
+        }
+
+        popup.SetLookup(repository);
+        employeeList.SetCatalog(repository);
     }
 
     void OnEnable()
     {
-        OpenProfile.Raised += ShowProfile;
+        SetListening(true);
     }
 
     void OnDisable()
     {
-        OpenProfile.Raised -= ShowProfile;
+        SetListening(false);
+    }
+
+    void SetListening(bool enabled)
+    {
+        if (windows != null)
+        {
+            for (int i = 0; i < windows.Count; i++)
+            {
+                Window window = windows[i];
+                if (window is ISelectableWindow selectable)
+                {
+                    if (enabled)
+                        selectable.ShowRequested += Show;
+                    else
+                        selectable.ShowRequested -= Show;
+                }
+
+                if (window is IPopupWindow popupWindow)
+                {
+                    if (enabled)
+                        popupWindow.BackRequested += Back;
+                    else
+                        popupWindow.BackRequested -= Back;
+                }
+            }
+        }
+
+        if (employeeList == null)
+            return;
+
+        if (enabled)
+            employeeList.PopupRequested += ShoPopup;
+        else
+            employeeList.PopupRequested -= ShoPopup;
     }
 
     public void Show(IWindow window)
@@ -53,7 +133,7 @@ public class WindowManager : MonoBehaviour
         current = window;
     }
 
-    public void ShowOver(IWindow window)
+    public void ShowPopup(IWindow window)
     {
         if (window == null || overlay == window)
             return;
@@ -73,9 +153,12 @@ public class WindowManager : MonoBehaviour
         current?.Open();
     }
 
-    void ShowProfile()
+    void ShoPopup(int id)
     {
-        ShowOver(profileWindow);
+        if (popup == null || !popup.Show(id))
+            return;
+
+        ShowPopup(popup);
     }
 
     void CloseOverlay()
