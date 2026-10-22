@@ -328,6 +328,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   openProfileButton: {fileID: 2964163096043747599}
+  favoriteButton: {fileID: 750571111526551522}
+  favoriteIcon: {fileID: 3857916507448899702}
+  favoriteOff: {fileID: 21300000, guid: 048b3620531f8924db6237538f6dbab2, type: 3}
+  favoriteOn: {fileID: 21300000, guid: 33cf4c004b6f2ae4099023383c778172, type: 3}
   nameText: {fileID: 9143553443408811392}
   descriptionText: {fileID: 5321839379020378524}
 --- !u!222 &2522272475682038465
